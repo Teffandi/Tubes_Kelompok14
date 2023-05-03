@@ -1,0 +1,47 @@
+Untuk file grain128aead-v2_opt.cpp (yang isinya encrypt dan decrypt) pake pseudocode dari paper grain128aead.
+
+Pseudocode untuk OTPgenerator:
+
+PROCEDURE call_grain(unsigned char* msg)
+output : single character hasil enkripsi 
+IF ((encrypt(ct, &clen, msg, mlen, ad, adlen, NULL, nonce, key)) = 0 ) THEN
+	FOR i = 0 to (clen-1)
+		output(ct[i])
+		increment one
+	END FOR
+END IF
+
+Procedure OTPgenerator (integer n)
+output: string Kode OTP 
+
+DECLARE string OTP
+DECLARE string str = "0123456789"
+SET len to length of str
+SET seed to be used in Random Number Generator
+FOR i = 0 to n
+    Generate Random Number
+	ASSIGN (Generated Random Number MOD len) to j
+	ASSIGN str[j] to otp[i]
+	ASSIGN (char(otp[i]) to msg[i])
+	output(otp[i])
+	increment one
+END FOR
+output("Encrypted OTP : ")
+call_grain(msg)
+output("OTP will expire in 5 seconds.....")
+output("Oops OTP is expired !!)
+output("press 1 for new OTP generation");
+output("press 2 for exit")
+input(choice)
+CASE choice :
+	1 : OTPgenerator(n)
+	2 : return 0
+END CASE
+
+ALGORITMA MAIN PROGRAM
+output("Enter length")
+input(n)
+OTPgenerator(n)
+return(0)
+
+Pseudocode untuk yg mqtt beloman
