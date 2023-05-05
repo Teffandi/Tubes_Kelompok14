@@ -75,8 +75,9 @@ TaskHandle_t Task2;
 void display_oled(char* msg){
   oled.setTextSize(1);         // set text size
   oled.setTextColor(WHITE);    // set text color
-  oled.setCursor(0, 10);       // set position to display
+  oled.setCursor(30,10);
   oled.println(msg); // set text
+  oled.fillRect(30,0,5,20,0x0000);
   oled.display();      
 }
 
@@ -99,6 +100,7 @@ void call_grain(unsigned char* ct,unsigned long long clen){
                 }
        char *buff_msg = reinterpret_cast<char*>(msg2);
        display_oled(buff_msg);
+       flag = false;
     //unlockVariable();
    // vTaskSuspend(Task1);
     // display_oled((msg2);
@@ -143,7 +145,7 @@ void callback(char* topic, byte* payload, unsigned int length_data) {
   byte msg[length_data];
   char buff[length_data];
   //msg[0] = '\0';
-  oled.clearDisplay(); // clear display
+ // oled.clearDisplay(); // clear display
   Serial.print("Message arrived [");
   //Serial.print(topic);
   //Serial.print("] ");
@@ -152,7 +154,11 @@ void callback(char* topic, byte* payload, unsigned int length_data) {
   }
   strToBin(msg,buff);
   Serial.println(length_data/2);
+  oled.fillRect(30,0,40,20,0x0000);
+  oled.display();
+  delay(100);  
   call_grain(msg,length_data/2);
+  
  // Serial.println("[APP] Free memory: " + String(esp_get_free_heap_size()) + " bytes");
  // unlockVariable();
  // vTaskDelay(100);
@@ -169,8 +175,14 @@ void reconnect() {
     // Attempt to connect
     if (client.connect(clientId.c_str())) {
       Serial.println("connected");
+      oled.setTextSize(1);         // set text size
+      oled.setTextColor(WHITE);    // set text color
+      oled.setCursor(50,50);       // set position to display
+      oled.println("CONNECTED");
+      oled.display();
       // Once connected, publish an announcement...
       client.publish("main/testing_kiwi_27", "device ready");
+      
       // ... and resubscribe
       client.subscribe("main/testing_kiwi_27");
     } else {
@@ -183,6 +195,13 @@ void reconnect() {
   }
 }
 
+void request(){
+  
+  client.publish("main/testing_kiwi_27_2", "requesting OTP");
+  client.subscribe("main/testing_kiwi_27");
+  
+}
+
 void setup() {
 
   Serial.begin(115200); 
@@ -190,11 +209,23 @@ void setup() {
   oled.begin(SSD1306_SWITCHCAPVCC, 0x3C); //bagin oled
   delay(2000);         // wait two seconds for initializing
   oled.clearDisplay(); // clear display
+
+  oled.setTextSize(1);         // set text size
+  oled.setTextColor(WHITE);    // set text color
+  oled.setCursor(0, 10);       // set position to display
+  oled.println("OTP :");
+  oled.setCursor(0,50);       // set position to display
+  oled.println("Status :");
+  oled.display();
   
 //MQQT
   setup_wifi();
   client.setServer(mqtt_server, 1883);
   client.setCallback(callback);
+
+//ping request
+pinMode(15,INPUT);
+
 }
 
 //Task1code: blinks an LED every 1000 ms
@@ -206,6 +237,10 @@ void loop() {
   
   if (!client.connected()) {
     reconnect();
+  }
+  if(digitalRead(15)==HIGH && flag == false){
+    request();
+    flag = true; //set flag to avoid spam
   }
  client.loop();
 
