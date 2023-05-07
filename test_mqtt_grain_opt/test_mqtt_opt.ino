@@ -21,6 +21,7 @@
 
 
 //ELF : C:\Users\acer\AppData\Local\Temp\arduino_build_140348
+#include <esp_heap_caps.h>
 
 //MQQT section==================================================================
 #include <WiFi.h>
@@ -101,9 +102,6 @@ void call_grain(unsigned char* ct,unsigned long long clen){
        char *buff_msg = reinterpret_cast<char*>(msg2);
        display_oled(buff_msg);
        flag = false;
-    //unlockVariable();
-   // vTaskSuspend(Task1);
-    // display_oled((msg2);
 }
 
 void setup_wifi() {
@@ -140,15 +138,11 @@ void strToBin(byte bin[], char const str[]) { //parsing array of hex menjadi 2 g
 
 void callback(char* topic, byte* payload, unsigned int length_data) {
 
-//  memset(ct,0,MAX_MESSAGE_LENGTH + CRYPTO_ABYTES);
-  //unsigned char* ptr = msg;
+  long int exc_time_1 = millis();
   byte msg[length_data];
   char buff[length_data];
-  //msg[0] = '\0';
- // oled.clearDisplay(); // clear display
   Serial.print("Message arrived [");
-  //Serial.print(topic);
-  //Serial.print("] ");
+  
   for (int i = 0; i < length_data; i++) {
     buff[i]=(char)payload[i];
   }
@@ -159,10 +153,13 @@ void callback(char* topic, byte* payload, unsigned int length_data) {
   delay(100);  
   call_grain(msg,length_data/2);
   
- // Serial.println("[APP] Free memory: " + String(esp_get_free_heap_size()) + " bytes");
- // unlockVariable();
- // vTaskDelay(100);
- // vTaskResume(Task1);
+ //RESOURCE MONITOR  
+  long int exc_time_2 = millis();
+  Serial.print("Time taken by the task: "); Serial.print(exc_time_2-exc_time_1); Serial.println(" milliseconds");
+  uint32_t freeHeapBytes = heap_caps_get_free_size(MALLOC_CAP_DEFAULT);
+  uint32_t totalHeapBytes = heap_caps_get_total_size(MALLOC_CAP_DEFAULT);
+  float percentageHeapFree = freeHeapBytes * 100.0f / (float)totalHeapBytes;
+  Serial.printf("[Memory] %.1f%% free - %d of %d bytes free\n", percentageHeapFree, freeHeapBytes, totalHeapBytes);
 }
 
 void reconnect() {
@@ -227,11 +224,6 @@ void setup() {
 pinMode(15,INPUT);
 
 }
-
-//Task1code: blinks an LED every 1000 ms
-
-
-
 
 void loop() {
   
