@@ -4,8 +4,12 @@
 #include<time.h>
 #include<windows.h>
 #include <iomanip>
+
+#include <chrono> //for execution time
+using namespace std::chrono;
 using namespace std;
 
+auto start = high_resolution_clock::now();
 //GRAIN
 #ifdef _MSC_VER
 #define _CRT_SECURE_NO_WARNINGS
@@ -71,7 +75,13 @@ string OTPgenerator(int n) // Generating OTP
 	}
 	cout<<endl;
     cout<<"Encrypted OTP : ";
+    auto start = high_resolution_clock::now(); //start counting execution time
     call_grain(msg);
+    auto stop = high_resolution_clock::now();
+    auto duration = duration_cast<microseconds>(stop - start);
+    cout<<endl;
+    cout << "Time taken by function: "
+         << duration.count() << " microseconds" << endl;
     cout<<endl;
     cout<<"OTP will expire in 5 seconds....."<<endl;
     Sleep(1000);
@@ -101,11 +111,12 @@ string OTPgenerator(int n) // Generating OTP
 int main() //main function
 {
 
-    int n;
-	cout<<"Enter length :";
-	cin>>n;
+    int n = 6;
+	//cout<<"Enter length :";
+	//cin>>n;
 
 	OTPgenerator(n);
+
     return 0;
 }
 
