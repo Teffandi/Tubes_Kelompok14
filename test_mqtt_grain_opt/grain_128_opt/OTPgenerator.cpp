@@ -75,13 +75,13 @@ string OTPgenerator(int n) // Generating OTP
 	}
 	cout<<endl;
     cout<<"Encrypted OTP : ";
-    auto start = high_resolution_clock::now(); //start counting execution time
+   // auto start = high_resolution_clock::now(); //start counting execution time
     call_grain(msg);
-    auto stop = high_resolution_clock::now();
-    auto duration = duration_cast<microseconds>(stop - start);
-    cout<<endl;
-    cout << "Time taken by function: "
-         << duration.count() << " microseconds" << endl;
+   // auto stop = high_resolution_clock::now();
+   // auto duration = duration_cast<microseconds>(stop - start);
+   // cout<<endl;
+   // cout << "Time taken by function: "
+  //       << duration.count() << " microseconds" << endl;
     cout<<endl;
     cout<<"OTP will expire in 5 seconds....."<<endl;
     Sleep(1000);
