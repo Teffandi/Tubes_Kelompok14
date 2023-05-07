@@ -111,9 +111,9 @@ string OTPgenerator(int n) // Generating OTP
 int main() //main function
 {
 
-    int n = 6;
-	//cout<<"Enter length :";
-	//cin>>n;
+    int n;
+	cout<<"Enter length :";
+	cin>>n;
 
 	OTPgenerator(n);
 
